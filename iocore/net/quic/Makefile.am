@@ -29,7 +29,7 @@ AM_CPPFLAGS += \
   -I$(abs_top_srcdir)/mgmt \
   -I$(abs_top_srcdir)/mgmt/utils \
   $(TS_INCLUDES) \
-  @OPENSSL_INCLUDES@
+  @OPENSSL_INCLUDES@ @YAMLCPP_INCLUDES@
 
 noinst_LIBRARIES = libquic.a
 
@@ -103,7 +103,10 @@ libquic_a_SOURCES = \
   QUICStreamFactory.cc \
   QUICPadder.cc \
   QUICContext.cc \
-  QUICTokenCreator.cc
+  QUICTokenCreator.cc \
+  QUICLogFrame.cc \
+  QUICLogEvent.cc \
+	QUICLog.cc
 
 #
 # Check Programs

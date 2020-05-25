@@ -25,6 +25,7 @@
 
 #include "QUICConnection.h"
 #include "QUICConfig.h"
+#include "QUICLog.h"
 
 class QUICRTTProvider;
 class QUICCongestionController;
@@ -39,6 +40,7 @@ public:
   virtual ~QUICContext(){};
   virtual QUICConnectionInfoProvider *connection_info() const = 0;
   virtual QUICConfig::scoped_config config() const            = 0;
+  virtual QLog::Trace &qlog_trace()                           = 0;
 };
 
 class QUICLDContext
@@ -48,6 +50,7 @@ public:
   virtual QUICConnectionInfoProvider *connection_info() const   = 0;
   virtual QUICLDConfig &ld_config() const                       = 0;
   virtual QUICPacketProtectionKeyInfoProvider *key_info() const = 0;
+  virtual QLog::Trace &qlog_trace()                             = 0;
 };
 
 class QUICCCContext
@@ -57,6 +60,7 @@ public:
   virtual QUICConnectionInfoProvider *connection_info() const = 0;
   virtual QUICCCConfig &cc_config() const                     = 0;
   virtual QUICRTTProvider *rtt_provider() const               = 0;
+  virtual QLog::Trace &qlog_trace()                           = 0;
 };
 
 class QUICStreamManagerContext
@@ -66,13 +70,14 @@ public:
   virtual QUICConnectionInfoProvider *connection_info() const = 0;
   virtual QUICRTTProvider *rtt_provider() const               = 0;
   virtual QUICPathManager *path_manager() const               = 0;
+  virtual QLog::Trace &qlog_trace()                           = 0;
 };
 
 class QUICContextImpl : public QUICContext, public QUICCCContext, public QUICLDContext, public QUICStreamManagerContext
 {
 public:
-  QUICContextImpl(QUICRTTProvider *rtt, QUICConnectionInfoProvider *info, QUICPacketProtectionKeyInfoProvider *key_info,
-                  QUICPathManager *path_manager);
+  QUICContextImpl(QLog::Trace &trace, QUICRTTProvider *rtt, QUICConnectionInfoProvider *info,
+                  QUICPacketProtectionKeyInfoProvider *key_info, QUICPathManager *path_manager);
 
   virtual QUICConnectionInfoProvider *connection_info() const override;
   virtual QUICConfig::scoped_config config() const override;
@@ -85,8 +90,10 @@ public:
   virtual QUICCCConfig &cc_config() const override;
 
   virtual QUICPathManager *path_manager() const override;
+  virtual QLog::Trace &qlog_trace() override;
 
 private:
+  QLog::Trace &_qlog_trace;
   QUICConfig::scoped_config _config;
   QUICPacketProtectionKeyInfoProvider *_key_info = nullptr;
   QUICConnectionInfoProvider *_connection_info   = nullptr;

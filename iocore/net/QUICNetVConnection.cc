@@ -42,6 +42,7 @@
 #include "QUICHandshake.h"
 #include "QUICConfig.h"
 #include "QUICIntUtil.h"
+#include "QUICLogUtils.h"
 
 using namespace std::literals;
 static constexpr std::string_view QUIC_DEBUG_TAG = "quic_net"sv;
@@ -247,6 +248,8 @@ QUICNetVConnection::init(QUICConnectionId peer_cid, QUICConnectionId original_ci
 
   this->_update_cids();
 
+  this->_trace = &this->_qlog.new_trace({"ats", QLog::Trace::VantagePointType::client, QLog::Trace::VantagePointType::client},
+                                        this->_original_quic_connection_id.hex());
   if (is_debug_tag_set(QUIC_DEBUG_TAG.data())) {
     QUICConDebug("dcid=%s scid=%s", this->_peer_quic_connection_id.hex().c_str(), this->_quic_connection_id.hex().c_str());
   }
@@ -275,6 +278,8 @@ QUICNetVConnection::init(QUICConnectionId peer_cid, QUICConnectionId original_ci
 
   this->_update_cids();
 
+  this->_trace = &this->_qlog.new_trace({"ats", QLog::Trace::VantagePointType::server, QLog::Trace::VantagePointType::server},
+                                        this->_original_quic_connection_id.hex());
   if (is_debug_tag_set(QUIC_DEBUG_TAG.data())) {
     QUICConDebug("dcid=%s scid=%s", this->_peer_quic_connection_id.hex().c_str(), this->_quic_connection_id.hex().c_str());
   }
@@ -388,7 +393,8 @@ QUICNetVConnection::start()
   });
   this->_path_manager   = new QUICPathManagerImpl(*this, *this->_path_validator);
 
-  this->_context = std::make_unique<QUICContextImpl>(&this->_rtt_measure, this, &this->_pp_key_info, this->_path_manager);
+  this->_context =
+    std::make_unique<QUICContextImpl>(*this->_trace, &this->_rtt_measure, this, &this->_pp_key_info, this->_path_manager);
   this->_five_tuple.update(this->local_addr, this->remote_addr, SOCK_DGRAM);
   QUICPath trusted_path = {{}, {}};
   // Version 0x00000001 uses stream 0 for cryptographic handshake with TLS 1.3, but newer version may not
@@ -422,7 +428,7 @@ QUICNetVConnection::start()
 
   this->_application_map = new QUICApplicationMap();
 
-  this->_frame_dispatcher = new QUICFrameDispatcher(this);
+  this->_frame_dispatcher = new QUICFrameDispatcher(*this->_context, this);
 
   // Create frame handlers
   this->_pinger = new QUICPinger();
@@ -487,6 +493,7 @@ QUICNetVConnection::free(EThread *t)
 
     super::clear();
   */
+  this->_qlog.dump();
   ALPNSupport::clear();
   this->_packet_handler->close_connection(this);
 }
@@ -660,6 +667,9 @@ QUICNetVConnection::stream_manager()
 void
 QUICNetVConnection::handle_received_packet(UDPPacket *packet)
 {
+  auto dr = std::make_unique<QLog::Transport::DatagramReceived>();
+  dr->set_byte_length(static_cast<int>(packet->getPktLength()));
+  this->_trace->push_event(std::move(dr));
   this->_packet_recv_queue.enqueue(packet);
 }
 
@@ -1576,6 +1586,7 @@ QUICNetVConnection::_packetize_frames(uint8_t *packet_buf, QUICEncryptionLevel l
   bool crypto        = false;
   uint8_t frame_instance_buffer[QUICFrame::MAX_INSTANCE_SIZE]; // This is for a frame instance but not serialized frame data
   QUICFrame *frame = nullptr;
+  std::vector<QLog::QLogFrameUPtr> qframes;
   for (auto g : this->_frame_generators.generators()) {
     // a non-ack_eliciting packet is ready, but we can not send continuous two ack_eliciting packets.
     while (g->will_generate_frame(level, len, ack_eliciting, seq_num)) {
@@ -1625,6 +1636,7 @@ QUICNetVConnection::_packetize_frames(uint8_t *packet_buf, QUICEncryptionLevel l
           crypto = true;
         }
 
+        qframes.push_back(QLog::QLogFrameFactory::create(*frame));
         frame->~QUICFrame();
       } else {
         // Move to next generator
@@ -1637,6 +1649,12 @@ QUICNetVConnection::_packetize_frames(uint8_t *packet_buf, QUICEncryptionLevel l
   if (len != 0) {
     // Packet is retransmittable if it's not ack only packet
     packet = this->_build_packet(packet_buf, level, first_block, ack_eliciting, probing, crypto);
+    std::unique_ptr<QLog::Transport::PacketSent> ps =
+      std::make_unique<QLog::Transport::PacketSent>(QLog::PacketTypeToName(packet->type()), QLog::QUICPacketToLogPacket(*packet));
+    for (auto &it : qframes) {
+      ps->append_frames(std::move(it));
+    }
+    this->_trace->push_event(std::move(ps));
   }
 
   return packet;

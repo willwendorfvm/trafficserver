@@ -100,9 +100,10 @@ private:
   const QUICConfigParams *_params;
 };
 
-QUICContextImpl::QUICContextImpl(QUICRTTProvider *rtt, QUICConnectionInfoProvider *info,
+QUICContextImpl::QUICContextImpl(QLog::Trace &trace, QUICRTTProvider *rtt, QUICConnectionInfoProvider *info,
                                  QUICPacketProtectionKeyInfoProvider *key_info, QUICPathManager *path_manager)
-  : _key_info(key_info),
+  : _qlog_trace(trace),
+    _key_info(key_info),
     _connection_info(info),
     _rtt_provider(rtt),
     _path_manager(path_manager),
@@ -151,4 +152,10 @@ QUICPathManager *
 QUICContextImpl::path_manager() const
 {
   return _path_manager;
+}
+
+QLog::Trace &
+QUICContextImpl::qlog_trace()
+{
+  return this->_qlog_trace;
 }

@@ -32,6 +32,7 @@
 #include "QUICPinger.h"
 #include "QUICPadder.h"
 #include "QUICPacketProtectionKeyInfo.h"
+#include "QUICLogUtils.h"
 
 #define QUICLDDebug(fmt, ...) \
   Debug("quic_loss_detector", "[%s] " fmt, this->_context.connection_info()->cids().data(), ##__VA_ARGS__)
@@ -444,6 +445,8 @@ QUICLossDetector::_detect_lost_packets(QUICPacketNumberSpace pn_space)
   if (!lost_packets.empty()) {
     this->_cc->on_packets_lost(lost_packets);
     for (auto lost_packet : lost_packets) {
+      this->_context.qlog_trace().push_event(
+        std::make_unique<QLog::Recovery::PacketLost>(QLog::PacketTypeToName(lost_packet.second->type), lost_packet.first));
       // -- ADDITIONAL CODE --
       // Not sure how we can get feedback from congestion control and when we should retransmit the lost packets but we need to send
       // them somewhere.

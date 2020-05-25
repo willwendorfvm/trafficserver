@@ -26,8 +26,11 @@
 #include "quic/QUICTypes.h"
 #include "I_EventSystem.h"
 #include "tscore/ink_hrtime.h"
+#include "QUICLog.h"
 #include <memory>
+#include <yaml-cpp/yaml.h>
 
+/*
 TEST_CASE("QUICType", "[quic]")
 {
   SECTION("QUICPath")
@@ -143,4 +146,33 @@ TEST_CASE("QUICType", "[quic]")
     CHECK(memcmp(token1.buf(), token2.buf(), token1.length()) == 0);
     CHECK(token1.cid() == token2.cid());
   }
+}
+*/
+
+TEST_CASE("YAML binary", "yaml")
+{
+  QLog::QUICLog log;
+  auto &trace                                         = log.new_trace("0x12345");
+  std::unique_ptr<QLog::Transport::FrameProcessed> de = std::make_unique<QLog::Transport::FrameProcessed>();
+
+  QUICPingFrame ping;
+  de->append_frames(QLog::QLogFrameFactory::create(ping));
+
+  trace.push_event(std::move(de));
+
+  log.dump();
+
+  YAML::Node root;
+  root.push_back("a");
+  root.push_back("b");
+  root.push_back("c");
+  root.push_back("c");
+
+  YAML::Node node;
+  node["hello"] = "world";
+  root.push_back(node);
+
+  YAML::Emitter emitter(std::cout);
+  emitter << YAML::DoubleQuoted << YAML::Flow << root;
+  std::cout << "\n";
 }

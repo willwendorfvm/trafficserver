@@ -23,6 +23,7 @@
 
 #include "QUICFrameDispatcher.h"
 #include "QUICDebugNames.h"
+#include "QUICLogUtils.h"
 
 static constexpr char tag[] = "quic_net";
 
@@ -31,7 +32,7 @@ static constexpr char tag[] = "quic_net";
 //
 // Frame Dispatcher
 //
-QUICFrameDispatcher::QUICFrameDispatcher(QUICConnectionInfoProvider *info) : _info(info) {}
+QUICFrameDispatcher::QUICFrameDispatcher(QUICContext &context, QUICConnectionInfoProvider *info) : _context(context), _info(info) {}
 
 void
 QUICFrameDispatcher::add_handler(QUICFrameHandler *handler)
@@ -50,8 +51,10 @@ QUICFrameDispatcher::receive_frames(QUICEncryptionLevel level, const uint8_t *pa
   is_flow_controlled            = false;
   QUICConnectionErrorUPtr error = nullptr;
 
+  std::unique_ptr<QLog::Transport::PacketReceived> qe =
+    std::make_unique<QLog::Transport::PacketReceived>(QLog::PacketTypeToName(packet->type()), QLog::QUICPacketToLogPacket(*packet));
   while (cursor < size) {
-    const QUICFrame &frame = this->_frame_factory.fast_create(payload + cursor, size - cursor, packet);
+    QUICFrame &frame = this->_frame_factory.fast_create(payload + cursor, size - cursor, packet);
     if (frame.type() == QUICFrameType::UNKNOWN) {
       QUICDebug("Failed to create a frame (%u bytes skipped)", size - cursor);
       break;
@@ -66,6 +69,8 @@ QUICFrameDispatcher::receive_frames(QUICEncryptionLevel level, const uint8_t *pa
     if (type == QUICFrameType::STREAM) {
       is_flow_controlled = true;
     }
+
+    qe->append_frames(QLog::QLogFrameFactory::create(frame));
 
     if (is_debug_tag_set(tag) && type != QUICFrameType::PADDING) {
       char msg[1024];
@@ -87,5 +92,6 @@ QUICFrameDispatcher::receive_frames(QUICEncryptionLevel level, const uint8_t *pa
     }
   }
 
+  this->_context.qlog_trace().push_event(std::move(qe));
   return error;
 }
