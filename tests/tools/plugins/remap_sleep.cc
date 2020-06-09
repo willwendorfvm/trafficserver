@@ -20,6 +20,11 @@
 #include <thread>
 #include <chrono>
 
+void
+TSPluginInit(int argc, const char *argv[])
+{
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Initialize the plugin as a remap plugin.
 //
