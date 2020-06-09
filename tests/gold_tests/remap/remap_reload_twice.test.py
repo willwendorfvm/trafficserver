@@ -28,7 +28,7 @@ ts = Test.MakeATSProcess("ts", command="traffic_manager", select_ports=True)
 
 # Add dummy remap rule
 ts.Disk.remap_config.AddLine(
-    'map http://1.example http://1.other'
+    'map http://1.example http://1.other @plugin=remap_sleep.so'
 )
 
 # Load plugin
