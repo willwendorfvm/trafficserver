@@ -33,9 +33,9 @@
 TSReturnCode
 TSRemapInit(TSRemapInterface *api_info, char *errbuf, int errbuf_size)
 {
-  cout << std::endl << "before sleep" << std::endl;
+  std::cout << std::endl << "before sleep" << std::endl;
   std::this_thread::sleep_for(std::chrono::seconds(3));
-  cout << std::endl << "after sleep" << std::endl;
+  std::cout << std::endl << "after sleep" << std::endl;
   return TS_SUCCESS; /* success */
 }
 
