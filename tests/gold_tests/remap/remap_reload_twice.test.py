@@ -51,24 +51,10 @@ Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'rema
 # p.StartBefore(Test.Processes.ts)
 
 # First reload
-tr = Test.AddTestRun("Original reload config")
-tr.DelayStart = 4  # delay start of test run to allow previous command to take effect
-tr.Processes.Default.StartBefore(Test.Processes.ts, ready=When.PortReady(ts.Variables.port))
-tr.Processes.Default.Command = 'traffic_ctl config reload'
-# Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
-tr.Processes.Default.Env = ts.Env
-tr.Processes.Default.ReturnCode = 0
-tr.Processes.Default.TimeOut = 5
+tr = Test.AddTestRun("Original and duplicated reload config")
+tr.Env = ts.Env
 tr.TimeOut = 5
 tr.StillRunningAfter = ts
 
-# Second reload
-tr = Test.AddTestRun("Duplicate reload config")
-tr.DelayStart = 4  # delay start of test run to allow previous command to take effect
-tr.Processes.Default.Command = 'traffic_ctl config reload'
-# Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
-tr.Processes.Default.Env = ts.Env
-tr.Processes.Default.ReturnCode = 0
-tr.Processes.Default.TimeOut = 5
-tr.TimeOut = 5
-tr.StillRunningAfter = ts
+lst = tr.SpawnCommands(cmdstr='traffic_ctl config reload', count=2)
+[p.StartBefore(Test.Processes.ts, ready=When.FileExists(tr.RunDirectory + 'ts/logs/diags.log')) for p in lst]
