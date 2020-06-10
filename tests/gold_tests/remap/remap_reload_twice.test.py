@@ -75,13 +75,10 @@ lst.append(tr.Processes.Process(
         returncode = 0
     )
 )
-lst.append(tr.Processes.Process(
-        name="reload{num}".format(num=3),
-        cmdstr = "traffic_ctl config reload",
-        returncode = 0
-    )
-)
+tr.Processes.Default.Command = "traffic_ctl config reload"
+tr.Processes.Default.ReturnCode = 0
+
 lst[0].StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
 lst[1].StartBefore(tr.Processes.touch0)
 lst[2].StartBefore(tr.Processes.reload1)
-lst[3].StartBefore(tr.Processes.touch2)
+tr.Processes.Default.StartBefore(tr.Processes.touch2)
