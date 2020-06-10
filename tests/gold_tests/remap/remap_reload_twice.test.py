@@ -51,13 +51,13 @@ tr.Processes.Default.TimeOut = 5
 tr.TimeOut = 5
 tr.StillRunningAfter = ts
 
-# Second reload
-tr = Test.AddTestRun("Duplicate reload config")
-tr.Processes.Default.StartBefore(Test.Processes.ts)
-tr.Processes.Default.Command = 'traffic_ctl config reload'
-# Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
-tr.Processes.Default.Env = ts.Env
-tr.Processes.Default.ReturnCode = 0
-tr.Processes.Default.TimeOut = 5
-tr.TimeOut = 5
-tr.StillRunningAfter = ts
+# # Second reload
+# tr = Test.AddTestRun("Duplicate reload config")
+# tr.Processes.Default.StartBefore(Test.Processes.ts)
+# tr.Processes.Default.Command = 'traffic_ctl config reload'
+# # Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
+# tr.Processes.Default.Env = ts.Env
+# tr.Processes.Default.ReturnCode = 0
+# tr.Processes.Default.TimeOut = 5
+# tr.TimeOut = 5
+# tr.StillRunningAfter = ts
