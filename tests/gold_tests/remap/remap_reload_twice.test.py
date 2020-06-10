@@ -46,7 +46,6 @@ Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'rema
 # First reload
 tr = Test.AddTestRun("Original reload config")
 tr.Processes.Default.StartBefore(Test.Processes.ts, ready=When.PortOpen(ts.Variables.port))
-tr.StillRunningAfter = ts
 tr.Processes.Default.Command = 'traffic_ctl config reload'
 # Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
 tr.Processes.Default.Env = ts.Env
