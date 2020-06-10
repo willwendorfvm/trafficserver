@@ -56,7 +56,7 @@ tr.Env = ts.Env
 tr.TimeOut = 5
 tr.StillRunningAfter = ts
 
-lst = tr.SpawnCommands(cmdstr='traffic_ctl config reload', count=2)
+# lst = []
 tr.Processes.Process(
     name="touch-{num}".format(num=0),
     cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
