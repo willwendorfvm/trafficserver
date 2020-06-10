@@ -77,7 +77,7 @@ tr.Processes.Process(
     cmdstr = "traffic_ctl config reload",
     returncode = 0
 )
-Test.Processes.touch-0.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
-Test.Processes.reload-1.StartBefore(Test.Processes.touch-0)
-Test.Processes.touch-2.StartBefore(Test.Processes.reload-1)
-Test.Processes.reload-3.StartBefore(Test.Processes.touch-2)
+tr.Processes.touch-0.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
+tr.Processes.reload-1.StartBefore(tr.Processes.touch-0)
+tr.Processes.touch-2.StartBefore(tr.Processes.reload-1)
+tr.Processes.reload-3.StartBefore(tr.Processes.touch-2)
