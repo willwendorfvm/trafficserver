@@ -47,7 +47,7 @@ TSRemapNewInstance(int argc, char *argv[], void **ih, char * /* errbuf ATS_UNUSE
   *globe = 0;
   delete globe;
   other = new int;
-  std::this_thread::sleep_for(std::chrono::seconds(3));
+  std::this_thread::sleep_for(std::chrono::seconds(8));
   globe = new int;
   delete other;
   std::cout << "after sleep" << std::endl;
