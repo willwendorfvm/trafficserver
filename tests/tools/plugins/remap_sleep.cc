@@ -27,22 +27,30 @@
 //{
 //}
 
+int* globe = nullptr;
+int* other = nullptr;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Initialize the plugin as a remap plugin.
 //
 TSReturnCode
 TSRemapInit(TSRemapInterface *api_info, char *errbuf, int errbuf_size)
 {
-  std::cout << "before sleep" << std::endl;
-  std::this_thread::sleep_for(std::chrono::seconds(3));
-  std::cout << "after sleep" << std::endl;
+  globe = new int;
   return TS_SUCCESS; /* success */
 }
 
 TSReturnCode
 TSRemapNewInstance(int argc, char *argv[], void **ih, char * /* errbuf ATS_UNUSED */, int /* errbuf_size ATS_UNUSED */)
 {
-  std::cout << "remapping" << std::endl;
+  std::cout << "before sleep" << std::endl;
+  *globe = 0;
+  delete globe;
+  other = new int;
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+  globe = new int;
+  delete other;
+  std::cout << "after sleep" << std::endl;
   return TS_SUCCESS;
 }
 
