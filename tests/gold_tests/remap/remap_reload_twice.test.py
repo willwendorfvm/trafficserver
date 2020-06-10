@@ -56,26 +56,30 @@ tr.Env = ts.Env
 tr.TimeOut = 5
 tr.StillRunningAfter = ts
 
-# lst = []
-tr.Processes.Process(
-    name="touch-{num}".format(num=0),
-    cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
-    returncode = 0
+lst = []
+lst.append(tr.Processes.Process(
+        name="touch-{num}".format(num=0),
+        cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
+        returncode = 0
+    )
 )
-tr.Processes.Process(
-    name="reload-{num}".format(num=1),
-    cmdstr = "traffic_ctl config reload",
-    returncode = 0
+lst.append(tr.Processes.Process(
+        name="reload-{num}".format(num=1),
+        cmdstr = "traffic_ctl config reload",
+        returncode = 0
+    )
 )
-tr.Processes.Process(
-    name="touch-{num}".format(num=2),
-    cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
-    returncode = 0
+lst.append(tr.Processes.Process(
+        name="touch-{num}".format(num=2),
+        cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
+        returncode = 0
+    )
 )
-tr.Processes.Process(
-    name="reload-{num}".format(num=3),
-    cmdstr = "traffic_ctl config reload",
-    returncode = 0
+lst.append(tr.Processes.Process(
+        name="reload-{num}".format(num=3),
+        cmdstr = "traffic_ctl config reload",
+        returncode = 0
+    )
 )
 tr.Processes.touch-0.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
 tr.Processes.reload-1.StartBefore(tr.Processes.touch-0)
