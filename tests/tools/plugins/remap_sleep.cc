@@ -33,15 +33,16 @@
 TSReturnCode
 TSRemapInit(TSRemapInterface *api_info, char *errbuf, int errbuf_size)
 {
-  std::cout << std::endl << "before sleep" << std::endl;
+  std::cout << "before sleep" << std::endl;
   std::this_thread::sleep_for(std::chrono::seconds(3));
-  std::cout << std::endl << "after sleep" << std::endl;
+  std::cout << "after sleep" << std::endl;
   return TS_SUCCESS; /* success */
 }
 
 TSReturnCode
 TSRemapNewInstance(int argc, char *argv[], void **ih, char * /* errbuf ATS_UNUSED */, int /* errbuf_size ATS_UNUSED */)
 {
+  std::cout << "remapping" << std::endl;
   return TS_SUCCESS;
 }
 
