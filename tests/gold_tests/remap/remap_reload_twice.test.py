@@ -43,23 +43,16 @@ Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'rema
 # Test body
 #
 
-t = Test.AddTestRun("Test traffic server started properly")
-t.StillRunningAfter = Test.Processes.ts
-p = t.Processes.Default
-p.Command = "curl http://127.0.0.1:{0}".format(ts.Variables.port)
-p.ReturnCode = 0 
-p.StartBefore(Test.Processes.ts)
-
-# # First reload
-# tr = Test.AddTestRun("Original reload config")
-# tr.Processes.Default.StartBefore(Test.Processes.ts, ready=When.PortOpen(ts.Variables.port))
-# tr.Processes.Default.Command = 'traffic_ctl config reload'
-# # Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
-# tr.Processes.Default.Env = ts.Env
-# tr.Processes.Default.ReturnCode = 0
-# tr.Processes.Default.TimeOut = 5
-# tr.TimeOut = 5
-# tr.StillRunningAfter = ts
+# First reload
+tr = Test.AddTestRun("Original reload config")
+tr.Processes.Default.StartBefore(Test.Processes.ts, ready=When.PortOpen(ts.Variables.port))
+tr.Processes.Default.Command = 'traffic_ctl config reload'
+# Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
+tr.Processes.Default.Env = ts.Env
+tr.Processes.Default.ReturnCode = 0
+tr.Processes.Default.TimeOut = 5
+tr.TimeOut = 5
+tr.StillRunningAfter = ts
 
 # # Second reload
 # tr = Test.AddTestRun("Duplicate reload config")
