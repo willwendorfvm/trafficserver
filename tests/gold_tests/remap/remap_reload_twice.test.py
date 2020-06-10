@@ -52,7 +52,7 @@ Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'rema
 
 # First reload
 tr = Test.AddTestRun("Original reload config")
-tr.DelayStart = 1  # delay start of test run to allow previous command to take effect
+tr.DelayStart = 4  # delay start of test run to allow previous command to take effect
 tr.Processes.Default.StartBefore(Test.Processes.ts, ready=When.PortReady(ts.Variables.port))
 tr.Processes.Default.Command = 'traffic_ctl config reload'
 # Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
@@ -64,6 +64,7 @@ tr.StillRunningAfter = ts
 
 # Second reload
 tr = Test.AddTestRun("Duplicate reload config")
+tr.DelayStart = 4  # delay start of test run to allow previous command to take effect
 tr.Processes.Default.Command = 'traffic_ctl config reload'
 # Need to copy over the environment so traffic_ctl knows where to find the unix domain socket
 tr.Processes.Default.Env = ts.Env
