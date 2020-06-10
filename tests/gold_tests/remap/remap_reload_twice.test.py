@@ -58,25 +58,25 @@ tr.StillRunningAfter = ts
 
 lst = []
 lst.append(tr.Processes.Process(
-        name="touch-{num}".format(num=0),
+        name="touch{num}".format(num=0),
         cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
         returncode = 0
     )
 )
 lst.append(tr.Processes.Process(
-        name="reload-{num}".format(num=1),
+        name="reload{num}".format(num=1),
         cmdstr = "traffic_ctl config reload",
         returncode = 0
     )
 )
 lst.append(tr.Processes.Process(
-        name="touch-{num}".format(num=2),
+        name="touch{num}".format(num=2),
         cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config')),
         returncode = 0
     )
 )
 lst.append(tr.Processes.Process(
-        name="reload-{num}".format(num=3),
+        name="reload{num}".format(num=3),
         cmdstr = "traffic_ctl config reload",
         returncode = 0
     )
