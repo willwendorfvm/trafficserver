@@ -58,24 +58,28 @@ tr.StillRunningAfter = ts
 
 lst = tr.SpawnCommands(cmdstr='traffic_ctl config reload', count=2)
 tr.Processes.Process(
-    name="touch-{num}".format(num=0),
-    cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config'),
-    returncode = 0
+        name="touch-{num}".format(num=0),
+        cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config'),
+        returncode = 0
+    )
 )
 tr.Processes.Process(
-    name="reload-{num}".format(num=1),
-    cmdstr = "traffic_ctl config reload",
-    returncode = 0
+        name="reload-{num}".format(num=1),
+        cmdstr = "traffic_ctl config reload",
+        returncode = 0
+    )
 )
 tr.Processes.Process(
-    name="touch-{num}".format(num=2),
-    cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config'),
-    returncode = 0
+        name="touch-{num}".format(num=2),
+        cmdstr = "touch {file}".format(file=os.path.join(tr.RunDirectory, 'ts/config/remap.config'),
+        returncode = 0
+    )
 )
 tr.Processes.Process(
-    name="reload-{num}".format(num=3),
-    cmdstr = "traffic_ctl config reload",
-    returncode = 0
+        name="reload-{num}".format(num=3),
+        cmdstr = "traffic_ctl config reload",
+        returncode = 0
+    )
 )
 Test.Processes.touch-0.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
 Test.Processes.reload-1.StartBefore(Test.Processes.touch-0)
