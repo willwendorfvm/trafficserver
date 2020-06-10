@@ -32,7 +32,8 @@ ts.Disk.remap_config.AddLine(
 )
 
 # Load plugin
-Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'remap_sleep.cc'), ts)
+Test.PreparePlugin(os.path.join(Test.Variables.AtsTestToolsDir, 'plugins', 'remap_sleep.cc'),
+        ts, add_plugin_config=False)
 
 #
 # Test body
