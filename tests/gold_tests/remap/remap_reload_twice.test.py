@@ -81,8 +81,7 @@ lst.append(tr.Processes.Process(
         returncode = 0
     )
 )
-print(tr.Processes)
-tr.Processes.touch-0.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
-tr.Processes.reload-1.StartBefore(tr.Processes.touch-0)
-tr.Processes.touch-2.StartBefore(tr.Processes.reload-1)
-tr.Processes.reload-3.StartBefore(tr.Processes.touch-2)
+lst[0].StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log')))
+lst[1].StartBefore(tr.Processes.touch-0)
+lst[2].StartBefore(tr.Processes.reload-1)
+lst[3].StartBefore(tr.Processes.touch-2)
