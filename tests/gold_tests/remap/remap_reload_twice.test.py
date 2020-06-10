@@ -24,11 +24,11 @@ Test duplicate command: traffic_ctl config reload (YTSATS-3294)
 '''
 Test.testName = 'Duplicate Reload Test'
 
+ts = Test.MakeATSProcess("ts", command="traffic_manager", select_ports=True)
+
 ts.Disk.records_config.update({
     'proxy.config.diags.debug.enabled': 0,
-})  
-
-ts = Test.MakeATSProcess("ts", command="traffic_manager", select_ports=True)
+})
 
 # Add dummy remap rule
 ts.Disk.remap_config.AddLine(
