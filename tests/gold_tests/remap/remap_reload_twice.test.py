@@ -57,4 +57,4 @@ tr.TimeOut = 5
 tr.StillRunningAfter = ts
 
 lst = tr.SpawnCommands(cmdstr='traffic_ctl config reload', count=2)
-[p.StartBefore(Test.Processes.ts, ready=When.FileExists(tr.RunDirectory + 'ts/logs/diags.log')) for p in lst]
+[p.StartBefore(Test.Processes.ts, ready=When.FileExists(os.path.join(tr.RunDirectory, 'ts/log/diags.log'))) for p in lst]
