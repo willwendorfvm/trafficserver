@@ -21,13 +21,13 @@ Test.Summary = '''
 Verify specific error message in event log with global max connection.
 '''
 
-ts = Test.MakeATSProcess("ts")
+ts = Test.MakeATSProcess("ts", enable_cache=False)
 replay_file = "overload.replay.yaml"
 server = Test.MakeVerifierServerProcess("server", replay_file)
 ts.Disk.records_config.update({
-    'proxy.config.diags.debug.enabled': 1,
-    'proxy.config.diags.debug.tags': 'http',
-    'proxy.config.net.connections_throttle': 2
+#    'proxy.config.diags.debug.enabled': 1,
+#    'proxy.config.diags.debug.tags': 'http',
+    'proxy.config.net.connections_throttle': 3
 })
 ts.Disk.remap_config.AddLine(
     'map / http://127.0.0.1:{0}'.format(server.Variables.http_port)
